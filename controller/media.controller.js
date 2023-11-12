@@ -1,4 +1,5 @@
 let qr = require("node-qr-image");
+const imagekit = require("../lib/imagekit");
 module.exports = {
   storageImage: (req, res) => {
     const imageUrl = `${req.protocol}://${req.get("host")}/images/${
@@ -51,5 +52,26 @@ module.exports = {
       message: "Success",
       data: qr_png,
     });
+  },
+
+  imagekitUpload: async (req, res) => {
+    try {
+      const stringFile = req.file.buffer.toString("base64");
+      const uploadFile = await imagekit.upload({
+        fileName: req.file.originalname,
+        file: stringFile,
+      });
+      return res.json({
+        status: 200,
+        message: "success",
+        data: {
+          name: uploadFile.name,
+          url: uploadFile.url,
+          type: uploadFile.fileType,
+        },
+      });
+    } catch (error) {
+      throw error;
+    }
   },
 };
