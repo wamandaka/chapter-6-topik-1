@@ -1,3 +1,4 @@
+let qr = require("node-qr-image");
 module.exports = {
   storageImage: (req, res) => {
     const imageUrl = `${req.protocol}://${req.get("host")}/images/${
@@ -33,6 +34,22 @@ module.exports = {
       data: {
         file_url: fileUrl,
       },
+    });
+  },
+
+  generateQR: (req, res) => {
+    const message = req.query.message;
+    var qr_png = qr.image(message, { type: "png" });
+    qr_png.pipe(
+      require("fs").createWriteStream(
+        `./public/qr/${message.toLowerCase()}.png`
+      )
+    );
+    // const qr_png = qr.image(message, { type: "png" });
+    return res.status(200).json({
+      status: 200,
+      message: "Success",
+      data: qr_png,
     });
   },
 };
